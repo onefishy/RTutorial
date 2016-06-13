@@ -9,8 +9,8 @@ read_file <- function(file_name){
   #head(mydata) prints the first rows of 'mydata'
   #colnames(mydata) prints the column names of 'mydata'
   data_summary <- list(type=class(mydata), ncols=ncol(mydata), 
-                      nrow=nrow(mydata), head=head(mydata), 
-                      colnames=names(mydata))
+                       nrow=nrow(mydata), head=head(mydata), 
+                       colnames=names(mydata))
   
   return(list(mydata, data_summary)) #returns a datafram, and summary of dataframe
 }
@@ -71,7 +71,7 @@ summary(subset(data_by_city_sale,
 #-----------------------   data visualization
 
 #histogram of short sale prices compared with overall prices
-hist(mydata$Price, breaks=40, col=rgb(1,0,0,0.5)) 
+hist(mydata$Price, breaks=40, col=rgb(1,0,0,0.5))
 hist(subset(mydata, Status=="Short Sale")$Price, breaks=20, col=rgb(0,0,1,0.5), add=T)
 box()
 
@@ -85,10 +85,16 @@ hist(mydata$Price, breaks=40, col=rgb(1,0,0,0.5))
 hist(subset(mydata, Status=="Regular")$Price, breaks=20, col=rgb(0,0,1,0.5), add=T)
 box()
 
-#scatter plot of regular prices vs sqft compared with foreclosure prices vs sqft
+#scatter plot of regular prices vs sqft with possible regression lines
 plot(mydata$Sqft, mydata$Price, main="Price vs Sqft", col=rgb(1,0,0,0.5),
      xlab="Sqft", ylab="Price", pch=19)
 
+abline(a=0, b=100, col=rgb(0,0,1,0.5), lwd=2)
+abline(a=100, b=300, col=rgb(0,0,1,0.5), lwd=2)
+
+#scatter plot of regular prices vs sqft compared with foreclosure prices vs sqft
+plot(mydata$Sqft, mydata$Price, main="Price vs Sqft", col=rgb(1,0,0,0.5),
+     xlab="Sqft", ylab="Price", pch=19)
 points(subset(mydata, Status=="Foreclosure")$Sqft, 
        subset(mydata, Status=="Foreclosure")$Price, 
        col=rgb(0,0,1,0.5), pch=19)
