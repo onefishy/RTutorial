@@ -1,6 +1,16 @@
 #Filtering data and getting summary statistics
 library(shiny)
 
+#Load in data, list of locations/sale options
+houses <- read.csv("California Home Prices (2009).csv")
+locationOpt <- levels(houses$Location) #List of Locations
+saleOpt <- levels(houses$Status) #List of sale types
+quantVariables = list("Price" = "Price", 
+                      "Number of Bedrooms" = "Bedrooms",
+                      "Number of Bathrooms" = "Bathrooms",
+                      "Square Footage" = "Sqft",
+                      "Price per Square Foot" = "Price.Sqft")
+
 ui <- fluidPage(
   
   titlePanel("Housing Information"),
@@ -62,16 +72,6 @@ ui <- fluidPage(
 
 server <- function(input, output) {
   
-  #Load in data, list of locations/sale options
-  houses <- read.csv("California Home Prices (2009).csv")
-  locationOpt <- levels(houses$Location) #List of Locations
-  saleOpt <- levels(houses$Status) #List of sale types
-  quantVariables = list("Price" = "Price", 
-                        "Number of Bedrooms" = "Bedrooms",
-                        "Number of Bathrooms" = "Bathrooms",
-                        "Square Footage" = "Sqft",
-                        "Price per Square Foot" = "Price.Sqft")
-  
   data <- reactive({ #Subset the data
     houses[which(houses$Location %in% input$location &
                    houses$Status %in% input$status &
@@ -92,7 +92,7 @@ server <- function(input, output) {
   })
   
   output$std <- renderPrint({ print("Standard Deviations")
-    apply(na.omit(data()[,c("Price", "Bedrooms", "Bathrooms", "Sqft", "Price.Sqft")]), MARGIN = 2, FUN = sd)
+    apply(na.omit(data()[,unlist(quantVariables)]), MARGIN = 2, FUN = sd)
   })
   
   
