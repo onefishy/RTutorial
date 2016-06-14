@@ -40,13 +40,21 @@ ui <- fluidPage(
       
     ),
     
+#    mainPanel(
+#      #Output() functions
+#      verbatimTextOutput("stats"),
+#      verbatimTextOutput("std"),
+#      plotOutput("hist"),
+#      plotOutput("graph"),
+#      verbatimTextOutput("regStats")
+#    )
+    
     mainPanel(
-      #Output() functions
-      verbatimTextOutput("stats"),
-      verbatimTextOutput("std"),
-      plotOutput("hist"),
-      plotOutput("graph"),
-      verbatimTextOutput("regStats")
+      tabsetPanel(type = "tabs", 
+                  tabPanel("Summary Statistics", verbatimTextOutput("stats"), verbatimTextOutput("std")), 
+                  tabPanel("Histogram of Prices", plotOutput("hist")),
+                  tabPanel("Regression", plotOutput("graph"), verbatimTextOutput("regStats"))
+      )
     )
     
   )
