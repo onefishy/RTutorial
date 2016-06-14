@@ -24,7 +24,7 @@ ui <- fluidPage(
       tabsetPanel(type="tabs",
               tabPanel("Histogram",plotOutput(outputId="hist")),
               tabPanel("Line Graph",plotOutput(outputId="line")),
-              tabPanel("Statistics Table",plotOutput(outputId="table"))
+              tabPanel("Statistics Table",tableOutput(outputId="table"))
       )
     )
    )
@@ -33,15 +33,30 @@ ui <- fluidPage(
 server <- function(input,output)  {
   
 # name reactive values  
-city <- reactive({subset(houses, Location==input$loc&Status==input$status)
+city <- reactive({
+                  houses[which(houses$Location %in% input$loc &
+                               houses$Status %in% input$status),] 
                 })
 ft <- reactive({lm(city()$Price~city()$Sqft)})
-tab <- reactive({ as.data.frame( summary(city()$Price) ) })
+tab <- reactive({ 
+                 median_cty <- median(city()$Price)
+                 mean_cty   <- mean(city()$Price)
+                 min_cty    <- min(city()$Price)
+                 max_cty    <- max(city()$Price)
+                 sd_cty     <- sd(city()$Price)
+                 Housing_Price_Statistics   <- c(median_cty,mean_cty,
+                                 min_cty,max_cty,
+                                 sd_cty)
+                 data.frame(Housing_Price_Statistics,row.names=c("median","mean",
+                                                "min","max","sd")
+                            ) 
+               })
 
 # compile output functions
   output$hist <- renderPlot({
                              hist(city()$Price,main="Histogram of Home Prices",
-                                  xlab="Price")
+                                  xlab="Price",breaks=20)
+                             box()
                  })
   output$line <- renderPlot({
                              plot(city()$Sqft,city()$Price,
@@ -51,7 +66,7 @@ tab <- reactive({ as.data.frame( summary(city()$Price) ) })
                                   )
                              abline(ft())
                  })
-  output$table <- renderDataTable({ tab() })
+  output$table <- renderTable(tab())                                 
   
 }
 
