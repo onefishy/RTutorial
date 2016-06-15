@@ -92,29 +92,40 @@ server <- shinyServer(function(input, output) {
   beds       = reactive({input$beds})
   price_sqft = reactive({input$pp_sq_ft})
   
-  relevant_data <- reactive({
-    subset(mydata,
-           subset = 
-             Location   == city() &
-             Price      <= max_price() &
-             Bedrooms   == beds() &
-             Bathrooms  == baths() &
-             Sqft       == sqft() &
-             Price.Sqft == price_sqft() &
-             Status     == sale_type() )
-  })
+  # I'd like to get this block to work, using subset() in order
+  #  to subset the data. I've gone onto the %in% syntax for now.
+
+  # relevant_data <- reactive({
+  #   subset(mydata,
+  #          subset =
+  #            Location   == city() &
+  #            Bedrooms   == beds() &
+  #            Bathrooms  == baths() &
+  #            Sqft       == sqft() &
+  #            Status     == sale_type() )
+  # })
   
+  
+  # Should do the same as the above block, but this uses th %in% syntax
+  relevant_data <- reactive({
+    mydata[which(
+           mydata$Location %in% input$cities &
+           mydata$Bedrooms %in% input$beds &
+           mydata$Bathrooms %in% input$baths&
+           mydata$Sqft %in% input$sqft &
+           mydata$Status %in% input$sale_type
+          ), ]
+  })
   
   # Histogram code
   output$histPlot <- renderPlot({
     
     # generate bins based on input$bins from ui.R
-    prices    <- relevant_data()$Price
-    old_prices   <- mydata$Price
-    bins <- seq(0, input$price, length.out = input$bins + 1)
+    prices    <- relevant_data$Price
+    bins <- seq(min(prices), max(prices), length.out = input$bins + 1)
     
     # draw the histogram with the specified number of bins
-    hist(prices, breaks = bins, col = 'darkgray', border = 'white')
+    hist(prices, breaks = 50, col = 'darkgray', border = 'white')
   })
   
   output$scatterPlot <- renderPlot({
